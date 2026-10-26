@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OneAPI Studio — 一个接口，接入所有 AI 能力</title>
+<meta name="description" content="图片、视频、Coding 三类 AI 能力统一接入。OpenAI 兼容协议，统一鉴权与计费，自动故障转移。" />
+<style>
+/* ============ 基础变量 ============ */
+:root{
+  --bg:#06060a;
+  --bg-2:#0a0a12;
+  --surface:rgba(255,255,255,.035);
+  --surface-2:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.08);
+  --border-2:rgba(255,255,255,.14);
+  --text:#e9e9f2;
+  --muted:#8a8aa3;
+  --muted-2:#6b6b85;
+  --cyan:#22d3ee;
+  --emerald:#34d399;
+  --violet:#a78bfa;
+  --fuchsia:#e879f9;
+  --blue:#60a5fa;
+  --radius:18px;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+h1,h2,h3{margin:0;line-height:1.15;letter-spacing:-.02em;font-weight:650}
+p{margin:0}
+::selection{background:rgba(34,211,238,.28)}
+
+/* ============ 背景光晕 ============ */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.glow i{position:absolute;display:block;border-radius:50%;filter:blur(90px);opacity:.5}
+.glow i:nth-child(1){width:620px;height:620px;top:-220px;left:-120px;background:radial-gradient(circle,rgba(34,211,238,.30),transparent 70%)}
+.glow i:nth-child(2){width:560px;height:560px;top:-160px;right:-140px;background:radial-gradient(circle,rgba(167,139,250,.28),transparent 70%)}
+.glow i:nth-child(3){width:720px;height:720px;top:520px;left:40%;background:radial-gradient(circle,rgba(232,121,249,.14),transparent 70%)}
+.grid-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 55% at 50% 0%,#000 30%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 55% at 50% 0%,#000 30%,transparent 78%);
+}
+/* ============ 布局 ============ */
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ============ 顶栏 ============ */
+header{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(6,6,10,.72);
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;gap:28px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:680;letter-spacing:-.01em;font-size:16.5px}
+.logo-mark{
+  width:28px;height:28px;border-radius:8px;flex:0 0 28px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet) 55%,var(--fuchsia));
+  display:grid;place-items:center;
+  box-shadow:0 0 22px rgba(34,211,238,.42);
+}
+.logo-mark svg{width:16px;height:16px;display:block}
+.nav-links{display:flex;gap:26px;margin-left:8px;font-size:14.5px;color:var(--muted)}
+.nav-links a{transition:color .18s}
+.nav-links a:hover{color:var(--text)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+
+/* ============ 按钮 ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;border-radius:11px;font-size:14.5px;font-weight:560;
+  white-space:nowrap;transition:transform .16s,box-shadow .22s,background .2s,border-color .2s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  color:#06060a;font-weight:650;
+  box-shadow:0 6px 26px -6px rgba(34,211,238,.55);
+}
+.btn-primary:hover{box-shadow:0 10px 34px -6px rgba(34,211,238,.75)}
+.btn-ghost{border:1px solid var(--border-2);background:var(--surface);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-2);border-color:rgba(255,255,255,.26)}
+.btn-sm{padding:8px 15px;font-size:13.5px;border-radius:9px}
+.btn-lg{padding:14px 26px;font-size:15.5px;border-radius:13px}
+/* ============ Hero ============ */
+.hero{padding:96px 0 72px;text-align:center}
+.badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:6px 15px 6px 11px;border-radius:999px;
+  border:1px solid var(--border-2);background:var(--surface);
+  font-size:13px;color:var(--muted);margin-bottom:30px;
+}
+.badge b{color:var(--text);font-weight:560}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(52,211,153,.18);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.hero h1{font-size:clamp(34px,6vw,62px);font-weight:700;margin-bottom:22px}
+.hero h1 .grad{
+  background:linear-gradient(100deg,var(--cyan),var(--violet) 48%,var(--fuchsia));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-sub{max-width:620px;margin:0 auto 36px;font-size:clamp(15px,2vw,18px);color:var(--muted);line-height:1.68}
+.hero-cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+
+/* ============ 三张能力卡 ============ */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:30px 0 20px}
+.card{
+  position:relative;overflow:hidden;
+  padding:30px 26px 26px;border-radius:var(--radius);
+  border:1px solid var(--border);background:var(--surface);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  text-align:left;display:flex;flex-direction:column;
+  transition:transform .26s cubic-bezier(.2,.7,.3,1),border-color .26s,box-shadow .26s;
+}
+.card::before{
+  content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:radial-gradient(420px circle at 50% 0%,var(--c-glow),transparent 72%);
+}
+.card:hover{transform:translateY(-6px);border-color:var(--c-border);box-shadow:0 22px 50px -22px var(--c-shadow)}
+.card:hover::before{opacity:1}
+.card>*{position:relative}
+
+.card-icon{
+  width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+  margin-bottom:20px;border:1px solid var(--c-border);
+  background:var(--c-glow);color:var(--c-main);
+}
+.card-icon svg{width:23px;height:23px;display:block}
+.card h3{font-size:19px;margin-bottom:9px}
+.card h3 span{font-size:13px;color:var(--muted-2);font-weight:450;margin-left:7px;font-family:var(--mono)}
+.card p{font-size:14.2px;color:var(--muted);line-height:1.66;margin-bottom:20px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px}
+.tag{
+  padding:4px 10px;border-radius:7px;font-size:12px;font-family:var(--mono);
+  color:var(--muted);border:1px solid var(--border);background:rgba(255,255,255,.03);
+}
+.card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:560;color:var(--c-main)}
+.card-link svg{width:15px;height:15px;transition:transform .2s}
+.card:hover .card-link svg{transform:translateX(3px)}
+.card-meta{font-size:12px;font-family:var(--mono);color:var(--muted-2)}
+
+.c-image{--c-main:var(--cyan);--c-border:rgba(34,211,238,.32);--c-glow:rgba(34,211,238,.10);--c-shadow:rgba(34,211,238,.28)}
+.c-video{--c-main:var(--fuchsia);--c-border:rgba(232,121,249,.32);--c-glow:rgba(232,121,249,.10);--c-shadow:rgba(232,121,249,.28)}
+.c-code {--c-main:var(--emerald);--c-border:rgba(52,211,153,.32);--c-glow:rgba(52,211,153,.10);--c-shadow:rgba(52,211,153,.26)}
+/* ============ 数据条 ============ */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  margin:46px 0 0;border-radius:var(--radius);overflow:hidden;
+  border:1px solid var(--border);background:var(--border);
+}
+.stat{background:var(--bg-2);padding:24px 22px;text-align:center}
+.stat b{display:block;font-size:27px;font-weight:680;letter-spacing:-.02em;margin-bottom:5px}
+.stat b .u{font-size:16px;color:var(--muted);font-weight:500;margin-left:2px}
+.stat span{font-size:12.8px;color:var(--muted-2)}
+
+/* ============ 统一接口区 ============ */
+.unified{padding:88px 0 36px}
+.sec-head{text-align:center;max-width:600px;margin:0 auto 42px}
+.sec-head h2{font-size:clamp(25px,4vw,36px);margin-bottom:13px}
+.sec-head p{color:var(--muted);font-size:15.5px}
+.code-card{
+  border-radius:var(--radius);border:1px solid var(--border);
+  background:var(--bg-2);overflow:hidden;
+}
+.code-bar{
+  display:flex;align-items:center;gap:4px;padding:0 14px;
+  height:46px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);
+}
+.code-tab{
+  padding:7px 15px;border-radius:9px;font-size:13.2px;font-family:var(--mono);
+  color:var(--muted-2);transition:background .18s,color .18s;
+}
+.code-tab:hover{color:var(--muted)}
+.code-tab.on{background:var(--surface-2);color:var(--text)}
+.code-copy{margin-left:auto;font-size:12.5px;color:var(--muted-2);padding:6px 11px;border-radius:8px;transition:background .18s,color .18s}
+.code-copy:hover{background:var(--surface);color:var(--text)}
+pre{
+  margin:0;padding:24px 26px;overflow-x:auto;
+  font-family:var(--mono);font-size:13.4px;line-height:1.78;
+}
+pre code{white-space:pre}
+.k{color:var(--violet)}.s{color:var(--emerald)}.c{color:var(--muted-2)}
+.f{color:var(--blue)}.n{color:var(--fuchsia)}.p{color:var(--cyan)}
+
+/* ============ 页脚 ============ */
+footer{margin-top:96px;border-top:1px solid var(--border);padding:34px 0;background:var(--bg-2)}
+.foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--muted-2)}
+.foot nav{margin-left:auto;display:flex;gap:22px}
+.foot nav a:hover{color:var(--text)}
+
+/* ============ 响应式 ============ */
+@media (max-width:900px){
+  .cards{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .nav-links{display:none}
+  .hero{padding:66px 0 48px}
+}
+@media (max-width:520px){
+  .stats{grid-template-columns:1fr}
+  .hero-cta .btn{width:100%}
+  .foot nav{margin-left:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#06060a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v18M3 12h18"/>
+        </svg>
+      </span>
+      OneAPI Studio
+    </a>
+    <nav class="nav-links">
+      <a href="#capabilities">能力</a>
+      <a href="#unified">接口</a>
+      <a href="#">文档</a>
+      <a href="#">定价</a>
+    </nav>
+    <div class="nav-right">
+      <a class="btn btn-sm btn-ghost" href="#">登录</a>
+      <a class="btn btn-sm btn-primary" href="#">免费试用</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="wrap hero">
+    <span class="badge">
+      <span class="dot" aria-hidden="true"></span>
+      已聚合 <b>38</b> 家上游供应商，统一 OpenAI 协议
+    </span>
+    <h1>一个接口，<br /><span class="grad">接入所有 AI 能力</span></h1>
+    <p class="hero-sub">
+      图片生成、视频生成、代码模型，三条能力线统一在同一套 API 之下。
+      一次对接，自动路由最优上游，故障自动转移。
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-lg btn-primary" href="#capabilities">开始体验</a>
+      <a class="btn btn-lg btn-ghost" href="#unified">查看接口示例</a>
+    </div>
+  </section>
+  <section class="wrap" id="capabilities">
+    <div class="cards">
+
+      <article class="card c-image">
+        <span class="card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2.5"/>
+            <circle cx="8.8" cy="9" r="1.6"/>
+            <path d="M21 15.5l-4.6-4.2L5.5 21"/>
+          </svg>
+        </span>
+        <h3>图片生成 <span>/v1/images</span></h3>
+        <p>文生图、图生图、局部重绘、放大修复。主流绘图模型全覆盖，统一参数格式，无需为每家改一遍代码。</p>
+        <div class="tags">
+          <span class="tag">FLUX.1</span>
+          <span class="tag">SDXL</span>
+          <span class="tag">DALL·E 3</span>
+          <span class="tag">Midjourney</span>
+          <span class="tag">+9</span>
+        </div>
+        <div class="card-foot">
+          <a class="card-link" href="#">
+            进入 Playground
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <span class="card-meta">~4s</span>
+        </div>
+      </article>
+
+      <article class="card c-video">
+        <span class="card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="5" width="14" height="14" rx="2.5"/>
+            <path d="M16.5 10.5L22 7.5v9l-5.5-3z"/>
+          </svg>
+        </span>
+        <h3>视频生成 <span>/v1/videos</span></h3>
+        <p>文生视频、图生视频、首尾帧控制。异步任务 + Webhook 回调，长任务进度可查，不占用连接。</p>
+        <div class="tags">
+          <span class="tag">Sora</span>
+          <span class="tag">Kling</span>
+          <span class="tag">Runway</span>
+          <span class="tag">Veo</span>
+          <span class="tag">+5</span>
+        </div>
+        <div class="card-foot">
+          <a class="card-link" href="#">
+            进入 Playground
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <span class="card-meta">异步 / Webhook</span>
+        </div>
+      </article>
+      <article class="card c-code">
+        <span class="card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/>
+          </svg>
+        </span>
+        <h3>Coding 模型 <span>/v1/chat</span></h3>
+        <p>聚合各家偏代码方向的文本模型。完全兼容 OpenAI SDK，支持流式输出、Function Calling、超长上下文。</p>
+        <div class="tags">
+          <span class="tag">Claude</span>
+          <span class="tag">GPT-5</span>
+          <span class="tag">Gemini</span>
+          <span class="tag">DeepSeek</span>
+          <span class="tag">+21</span>
+        </div>
+        <div class="card-foot">
+          <a class="card-link" href="#">
+            进入 Playground
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <span class="card-meta">流式 / 低延迟</span>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b>38<span class="u">家</span></b><span>上游供应商</span></div>
+      <div class="stat"><b>99.95<span class="u">%</span></b><span>可用性（近 30 天）</span></div>
+      <div class="stat"><b>186<span class="u">ms</span></b><span>网关中位延迟</span></div>
+      <div class="stat"><b>1<span class="u">套</span></b><span>统一密钥与账单</span></div>
+    </div>
+  </section>
+  <section class="wrap unified" id="unified">
+    <div class="sec-head">
+      <h2>换个 base_url，就接完了</h2>
+      <p>三类能力共用一套鉴权与错误码。已有的 OpenAI SDK 代码不用重写。</p>
+    </div>
+
+    <div class="code-card">
+      <div class="code-bar" role="tablist">
+        <button class="code-tab on" role="tab" aria-selected="true" data-pane="img">图片</button>
+        <button class="code-tab" role="tab" aria-selected="false" data-pane="vid">视频</button>
+        <button class="code-tab" role="tab" aria-selected="false" data-pane="code">Coding</button>
+        <button class="code-copy" id="copyBtn">复制</button>
+      </div>
+
+      <pre data-pane="img"><code><span class="c"># 文生图 — 换 base_url 即可</span>
+<span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = <span class="f">OpenAI</span>(
+    base_url=<span class="s">"https://api.oneapi.studio/v1"</span>,
+    api_key=<span class="s">"sk-oneapi-..."</span>,
+)
+
+img = client.images.<span class="f">generate</span>(
+    model=<span class="s">"flux-1.1-pro"</span>,
+    prompt=<span class="s">"霓虹雨夜的赛博东京街头，电影感"</span>,
+    size=<span class="s">"1024x1024"</span>,
+    n=<span class="n">4</span>,
+)
+<span class="f">print</span>(img.data[<span class="n">0</span>].url)</code></pre>
+
+      <pre data-pane="vid" hidden><code><span class="c"># 文生视频 — 异步任务，轮询或 Webhook</span>
+<span class="k">import</span> requests
+
+task = requests.<span class="f">post</span>(
+    <span class="s">"https://api.oneapi.studio/v1/videos/generations"</span>,
+    headers={<span class="s">"Authorization"</span>: <span class="s">"Bearer sk-oneapi-..."</span>},
+    json={
+        <span class="p">"model"</span>:    <span class="s">"kling-v2-master"</span>,
+        <span class="p">"prompt"</span>:   <span class="s">"航拍穿过云层，日出破晓"</span>,
+        <span class="p">"duration"</span>: <span class="n">5</span>,
+        <span class="p">"webhook"</span>:  <span class="s">"https://your.app/hook"</span>,
+    },
+).<span class="f">json</span>()
+
+<span class="f">print</span>(task[<span class="s">"task_id"</span>], task[<span class="s">"status"</span>])  <span class="c"># queued</span></code></pre>
+      <pre data-pane="code" hidden><code><span class="c">// Coding — 原生 OpenAI SDK，流式输出</span>
+<span class="k">import</span> OpenAI <span class="k">from</span> <span class="s">"openai"</span>;
+
+<span class="k">const</span> client = <span class="k">new</span> <span class="f">OpenAI</span>({
+  baseURL: <span class="s">"https://api.oneapi.studio/v1"</span>,
+  apiKey:  process.env.<span class="p">ONEAPI_KEY</span>,
+});
+
+<span class="k">const</span> stream = <span class="k">await</span> client.chat.completions.<span class="f">create</span>({
+  model:    <span class="s">"claude-opus-5-5"</span>,   <span class="c">// 或 gpt-5 / deepseek-v3</span>
+  messages: [{ role: <span class="s">"user"</span>, content: <span class="s">"重构这个函数并加测试"</span> }],
+  stream:   <span class="k">true</span>,
+});
+
+<span class="k">for await</span> (<span class="k">const</span> chunk <span class="k">of</span> stream) {
+  process.stdout.<span class="f">write</span>(chunk.choices[<span class="n">0</span>]?.delta?.content ?? <span class="s">""</span>);
+}</code></pre>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 OneAPI Studio</span>
+    <nav>
+      <a href="#">文档</a>
+      <a href="#">状态</a>
+      <a href="#">定价</a>
+      <a href="#">联系我们</a>
+    </nav>
+  </div>
+</footer>
+<script>
+(function () {
+  var tabs  = document.querySelectorAll('.code-tab');
+  var panes = document.querySelectorAll('pre[data-pane]');
+  var copy  = document.getElementById('copyBtn');
+
+  function show(name) {
+    tabs.forEach(function (t) {
+      var on = t.dataset.pane === name;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    panes.forEach(function (p) { p.hidden = p.dataset.pane !== name; });
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.dataset.pane); });
+  });
+
+  copy.addEventListener('click', function () {
+    var active = document.querySelector('pre[data-pane]:not([hidden]) code');
+    if (!active) return;
+    navigator.clipboard.writeText(active.innerText).then(function () {
+      copy.textContent = '已复制';
+      setTimeout(function () { copy.textContent = '复制'; }, 1600);
+    }).catch(function () {
+      copy.textContent = '复制失败';
+      setTimeout(function () { copy.textContent = '复制'; }, 1600);
+    });
+  });
+})();
+</script>
+</body>
+</html>
