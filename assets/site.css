@@ -208,14 +208,6 @@ header{
   content:'';position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,transparent 55%,rgba(10,10,13,.85));
 }
-.media-tag{
-  position:absolute;left:14px;top:14px;z-index:2;
-  display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border-radius:var(--r-pill);
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#fff;
-  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-}
-.media-tag i{width:6px;height:6px;border-radius:50%;background:var(--cat);box-shadow:0 0 10px var(--cat)}
 .media-off{
   position:absolute;right:14px;top:14px;z-index:2;
   padding:5px 11px;border-radius:var(--r-pill);
@@ -296,8 +288,6 @@ header{
 .card-icon svg{width:19px;height:19px;display:block}
 .card-title-wrap{flex:1;min-width:0}
 .card-title{font-size:18px;font-weight:680;color:var(--ink);letter-spacing:-.025em;margin-bottom:2px}
-.card-subtitle{font-size:11.5px;font-family:var(--mono);color:var(--muted-2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px}
 .card-foot{
   display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;
@@ -329,8 +319,6 @@ header{
 .providers{padding:28px 0 30px;border-bottom:1px solid var(--border);overflow:hidden;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
   mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.providers-head{max-width:1200px;margin:0 auto 20px;padding:0 24px;text-align:center;
-  font-size:11px;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2)}
 .marquee{display:flex;width:max-content;animation:marquee 60s linear infinite}
 .providers:hover .marquee{animation-play-state:paused}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -346,9 +334,6 @@ header{
 .section{padding:clamp(72px,8vw,120px) 0}
 .section.alt{background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .sec-head{max-width:660px;margin:0 auto 48px;text-align:center}
-.sec-kicker{display:inline-flex;align-items:center;gap:10px;margin-bottom:16px;
-  font-size:11px;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-.sec-kicker::before,.sec-kicker::after{content:'';width:18px;height:1px;background:var(--border-2)}
 .sec-head h2,.market-head h2{font-size:clamp(32px,4.6vw,56px);font-weight:680;letter-spacing:-.045em;
   color:var(--ink);margin-bottom:16px;line-height:1.05}
 .sec-head p,.market-head p{font-size:16px;color:var(--muted);line-height:1.7}
@@ -392,8 +377,6 @@ header{
 .mcard-logo img{width:26px;height:26px;object-fit:contain;display:block}
 .mcard-name{font-size:16px;font-weight:650;color:var(--ink);letter-spacing:-.02em;line-height:1.3;
   display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.badge-new{font-size:9.5px;font-weight:750;letter-spacing:.06em;padding:2px 6px;border-radius:5px;
-  background:linear-gradient(120deg,var(--violet),var(--rose));color:#fff;text-transform:uppercase}
 .mcard-vendor{font-size:13px;color:var(--muted);margin-top:1px}
 .mcard-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;
   padding-top:14px;border-top:1px solid var(--border)}
@@ -408,26 +391,52 @@ header{
 .market-more{display:flex;gap:10px;justify-content:center;margin-top:36px}
 .market-empty{grid-column:1/-1;padding:60px 20px;text-align:center;color:var(--muted-2);font-size:15px}
 
-/* 模型市场卡片上的模型 ID，点击复制 */
+/* 模型市场卡片上的模型 ID：点击复制，右侧小图标从「复制」形变为「对勾」 */
 .mcard-id{
-  display:inline-flex;align-items:center;margin-top:7px;padding:2px 8px;border-radius:6px;
+  position:relative;display:inline-flex;align-items:center;margin-top:7px;padding:2px 24px 2px 8px;border-radius:6px;
   font-family:var(--mono);font-size:11px;color:var(--ink-2);
-  background:rgba(255,255,255,.05);border:1px solid var(--border);transition:all .16s;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);transition:border-color .16s,color .16s;
 }
 .mcard-id:hover{border-color:var(--border-2);color:var(--ink)}
 .mcard-id.is-done{color:var(--ok);border-color:rgba(52,211,153,.4)}
+.mcard-id::before,.mcard-id::after{left:auto;right:7px;width:11px;height:11px}
 
 /* ================= 通用复制按钮 ================= */
 .copy-btn{
   display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
   padding:6px 12px;border-radius:var(--r-pill);white-space:nowrap;
   font-size:12px;font-weight:600;color:#0a0a0c;background:var(--ink);
-  transition:all .16s var(--ease);
+  transition:background .2s var(--ease),color .2s var(--ease);
 }
 .copy-btn:hover{background:#fff}
 .copy-btn.ghost{background:transparent;color:var(--ink-2);border:1px solid var(--border-2)}
 .copy-btn.ghost:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
 .copy-btn.is-done{background:var(--ok);color:#04150d}
+
+/* ================= 形变图标 =================
+   复制图标收缩旋转消失，同时对勾从反方向旋入，读起来是「复制」变成了「完成」。
+   按钮里的文字保留给读屏软件，视觉上只看图标。思路参考 Morphicons。 */
+:root{
+  --i-copy:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='11' height='11' rx='2'/%3E%3Cpath d='M5 15V5a2 2 0 0 1 2-2h10'/%3E%3C/svg%3E");
+  --i-check:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  --morph:cubic-bezier(.34,1.56,.64,1);
+}
+.copy-ico{position:relative;width:32px;height:32px;padding:0;border-radius:50%;font-size:0;color:#0a0a0c}
+.copy-ico::before,.copy-ico::after,.mcard-id::before,.mcard-id::after{
+  content:'';position:absolute;inset:0;margin:auto;width:15px;height:15px;background:currentColor;
+  -webkit-mask:var(--i-copy) center/contain no-repeat;mask:var(--i-copy) center/contain no-repeat;
+  transition:transform .42s var(--morph),opacity .2s var(--ease);
+}
+.copy-ico::after,.mcard-id::after{
+  -webkit-mask-image:var(--i-check);mask-image:var(--i-check);
+  opacity:0;transform:scale(.3) rotate(60deg);
+}
+.copy-ico.is-done::before,.mcard-id.is-done::before{opacity:0;transform:scale(.3) rotate(-60deg)}
+.copy-ico.is-done::after,.mcard-id.is-done::after{opacity:1;transform:none}
+/* 复制失败：变红并轻晃一下（剪贴板权限被拒等情况） */
+.copy-ico.is-fail,.mcard-id.is-fail{background:var(--rose) !important;color:#2a0710 !important;animation:copy-fail .36s}
+.mcard-id.is-fail{color:#fff !important}
+@keyframes copy-fail{25%,75%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
 
 /* ================= 接入信息卡 ================= */
 .access-card{
@@ -501,7 +510,7 @@ header{
 .key-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
 
 /* ================= 快速开始 ================= */
-.quick-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
+.quick-grid{display:block}
 .code-card{border-radius:var(--r-lg);border:1px solid var(--border-2);background:#0d0d11;overflow:hidden;
   box-shadow:0 40px 80px -40px rgba(167,139,250,.25)}
 .code-bar{display:flex;align-items:center;gap:2px;padding:0 12px;height:46px;
@@ -513,21 +522,13 @@ header{
 .code-copy{margin-left:auto;font-size:11.5px;font-family:var(--mono);color:var(--muted);
   padding:6px 12px;border-radius:var(--r-pill);border:1px solid var(--border);transition:all .16s}
 .code-copy:hover{color:var(--ink);border-color:var(--border-2)}
+.code-copy.copy-ico{width:30px;height:30px;padding:0;font-size:0;color:var(--ink-2)}
+.code-copy.copy-ico.is-done{color:var(--ok);border-color:rgba(52,211,153,.4)}
 .code-body{padding:22px 24px;overflow-x:auto}
 .code-body pre{margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.9;color:#c8c8d0;white-space:pre}
 .k{color:#c4a7ff}.s{color:#86e3ad}.c{color:#55555f}
 .f{color:#7cc4ff}.n{color:#ffb86b}.p{color:#67e8f9}
 
-.side-list{display:flex;flex-direction:column;gap:12px}
-.side-card{display:flex;gap:14px;padding:20px;border-radius:var(--r-lg);
-  border:1px solid var(--border);background:var(--surface)}
-.side-ico{width:34px;height:34px;flex:0 0 34px;border-radius:10px;display:grid;place-items:center;
-  background:rgba(167,139,250,.12);color:var(--violet)}
-.side-card:nth-child(2) .side-ico{background:rgba(56,217,245,.1);color:var(--cyan)}
-.side-card:nth-child(3) .side-ico{background:rgba(255,184,77,.1);color:var(--amber)}
-.side-ico svg{width:17px;height:17px}
-.side-card h4{font-size:14px;font-weight:640;color:var(--ink);margin-bottom:4px}
-.side-card p{font-size:13px;color:var(--muted);line-height:1.65}
 
 /* ================= MCP 三步 ================= */
 .steps-card{border-radius:var(--r-xl);border:1px solid var(--border);background:var(--surface);padding:32px}
@@ -550,6 +551,9 @@ header{
 .step-code span{overflow:hidden;text-overflow:ellipsis}
 .step-copy{margin-left:auto;padding:4px 10px;border-radius:6px;background:var(--ink);color:#0a0a0c;
   font-size:10.5px;font-weight:600;white-space:nowrap;flex:0 0 auto}
+.step-copy.copy-ico{width:26px;height:26px;padding:0;font-size:0;border-radius:7px;transition:background .2s}
+.step-copy.copy-ico::before,.step-copy.copy-ico::after{width:13px;height:13px}
+.step-copy.copy-ico.is-done{background:var(--ok)}
 .steps-link{display:inline-flex;align-items:center;gap:6px;margin-top:24px;font-size:13.5px;font-weight:560;
   color:var(--ink-2);transition:color .16s}
 .steps-link:hover{color:var(--ink)}
@@ -607,7 +611,6 @@ header{
 .cta h2{font-size:clamp(28px,4vw,48px);font-weight:680;letter-spacing:-.045em;line-height:1.1;margin-bottom:16px}
 .cta p{font-size:16px;color:var(--muted);margin-bottom:32px;line-height:1.7}
 .cta-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.cta-foot{margin-top:22px;font-size:12px;color:var(--muted-2);font-family:var(--mono)}
 
 /* ================= 页脚 ================= */
 footer{border-top:1px solid var(--border);background:var(--bg-2)}
@@ -628,7 +631,6 @@ footer{border-top:1px solid var(--border);background:var(--bg-2)}
 
 /* ================= 响应式 ================= */
 @media (max-width:1024px){
-  .quick-grid{grid-template-columns:1fr}
   .foot-grid{grid-template-columns:1fr 1fr}
   .card-media{height:208px}
 }

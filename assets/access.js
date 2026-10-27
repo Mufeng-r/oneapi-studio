@@ -33,14 +33,26 @@
 
   // ===== 复制 =====
   function copyText(text, btn) {
+    // 图标按钮（.copy-ico / data-keep-text）只靠图标形变反馈，读屏名称同步改为「已复制」；
+    // 文字按钮仍临时把文字换成结果
     const done = function (ok) {
       if (!btn) return;
-      const label = btn.dataset.label || btn.textContent;
-      btn.dataset.label = label;
-      btn.textContent = ok ? '已复制' : '复制失败';
+      const iconOnly = btn.classList.contains('copy-ico') || btn.hasAttribute('data-keep-text');
+      const attr = iconOnly ? 'aria-label' : null;
+      // 记住原始状态（含「原本没有 aria-label」），复原时不改变按钮原来的读屏名称
+      if (!('label' in btn.dataset)) btn.dataset.label = attr ? (btn.getAttribute(attr) || '') : btn.textContent;
+      const label = btn.dataset.label;
+      const result = ok ? '已复制' : '复制失败';
+      if (attr) btn.setAttribute(attr, result); else btn.textContent = result;
       btn.classList.toggle('is-done', ok);
+      btn.classList.toggle('is-fail', !ok);   // 图标按钮没有文字，失败也要有视觉反馈
       clearTimeout(btn._t);
-      btn._t = setTimeout(function () { btn.textContent = label; btn.classList.remove('is-done'); }, 1600);
+      btn._t = setTimeout(function () {
+        if (!attr) btn.textContent = label;
+        else if (label) btn.setAttribute(attr, label);
+        else btn.removeAttribute(attr);
+        btn.classList.remove('is-done', 'is-fail');
+      }, 1600);
     };
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
@@ -97,8 +109,7 @@
     dlg.setAttribute('aria-labelledby', 'keyDlgTitle');
     dlg.innerHTML =
       '<div class="key-head">' +
-        '<div><h3 id="keyDlgTitle">你的 API Key <span class="key-badge">演示</span></h3>' +
-        '<p>把下面两项填进任意 OpenAI SDK，就能调用全部 29 个模型。</p></div>' +
+        '<div><h3 id="keyDlgTitle">你的 API Key <span class="key-badge">演示</span></h3></div>' +
         '<button class="key-x" data-key-act="close" aria-label="关闭">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
         '</button>' +
@@ -106,26 +117,25 @@
       '<div class="key-field">' +
         '<label>API Key</label>' +
         '<div class="key-value"><code data-key-dlg></code>' +
-          '<button class="copy-btn" data-key-act="copy-key">复制</button>' +
+          '<button class="copy-btn copy-ico" data-key-act="copy-key" aria-label="复制 API Key">复制</button>' +
           '<button class="copy-btn ghost" data-key-act="regen" title="作废当前 Key 并生成新的">重新生成</button>' +
         '</div>' +
       '</div>' +
       '<div class="key-field">' +
-        '<label>接口地址 <small>Base URL</small></label>' +
+        '<label>接口地址</label>' +
         '<div class="key-value"><code>' + BASE + '</code>' +
-          '<button class="copy-btn" data-copy-text="' + BASE + '">复制</button>' +
+          '<button class="copy-btn copy-ico" data-copy-text="' + BASE + '" aria-label="复制接口地址">复制</button>' +
         '</div>' +
       '</div>' +
       '<div class="key-warn">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>' +
-        '<span>这是<b>演示 Key</b>，用于体验接入流程，不能真实调用。正式版注册登录后在控制台创建；' +
-        'Key 等同于账户密码，请只放在服务端或环境变量里，不要写进前端代码或提交到仓库。</span>' +
+        '<span><b>演示 Key，不能真实调用。</b>正式 Key 等同账户密码，只放在服务端或环境变量里。</span>' +
       '</div>' +
       '<div class="key-code">' +
         '<div class="key-code-bar">' +
           '<button class="key-tab on" data-key-lang="py">Python</button>' +
           '<button class="key-tab" data-key-lang="curl">cURL</button>' +
-          '<button class="copy-btn" data-key-act="copy-code">复制代码</button>' +
+          '<button class="copy-btn copy-ico" data-key-act="copy-code" aria-label="复制代码">复制代码</button>' +
         '</div>' +
         '<pre data-key-code></pre>' +
       '</div>' +
