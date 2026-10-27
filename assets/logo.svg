@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>OneAPI Studio</title>
+  <!-- 翻转中的卡片：白色正面 + 紫色侧边，正面镂空出字母 O（遮罩挖空，适配任意背景） -->
+  <defs>
+    <mask id="o-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <ellipse cx="27.5" cy="32" rx="8.2" ry="11" fill="none" stroke="#000" stroke-width="5"/>
+    </mask>
+  </defs>
+  <path d="M44 16 L53 20.5 V43.5 L44 48 Z" fill="#a78bfa" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M11 9 L44 16 V48 L11 55 Z" fill="#f5f5f7" stroke="#f5f5f7" stroke-width="3" stroke-linejoin="round" mask="url(#o-cut)"/>
+</svg>

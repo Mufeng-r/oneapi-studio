@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 浏览器标签图标：深色圆角底，保证在浅色标签栏上也看得见白色卡片 -->
+  <defs>
+    <mask id="o-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <ellipse cx="27.5" cy="32" rx="8.2" ry="11" fill="none" stroke="#000" stroke-width="5.5"/>
+    </mask>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0b0b0e"/>
+  <g transform="translate(4.5 4.6) scale(0.86)">
+    <path d="M44 16 L53 20.5 V43.5 L44 48 Z" fill="#a78bfa" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M11 9 L44 16 V48 L11 55 Z" fill="#f5f5f7" stroke="#f5f5f7" stroke-width="3" stroke-linejoin="round" mask="url(#o-cut)"/>
+  </g>
+</svg>

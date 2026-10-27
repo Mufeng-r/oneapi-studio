@@ -71,13 +71,12 @@ header{
 }
 .nav{display:flex;align-items:center;gap:34px;height:68px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:720;font-size:16.5px;letter-spacing:-.025em;white-space:nowrap;flex:0 0 auto}
+/* 翻转卡片 Logo（assets/logo.svg）：悬停时卡片再侧转一点，呼应「点卡片翻转」的交互 */
 .logo-mark{
-  width:30px;height:30px;flex:0 0 30px;border-radius:9px;
-  display:grid;place-items:center;color:#0a0a0c;
-  background:linear-gradient(140deg,#fff,#cfcfd8);
-  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 6px 18px -6px rgba(167,139,250,.55);
+  width:32px;height:32px;flex:0 0 32px;display:block;
+  transition:transform .45s var(--ease);
 }
-.logo-mark svg{width:18px;height:18px;display:block}
+.logo:hover .logo-mark{transform:perspective(120px) rotateY(-28deg)}
 .nav-links{display:flex;gap:28px;margin-left:8px;font-size:14.5px;color:var(--muted);font-weight:520}
 .nav-links a{transition:color .16s}
 .nav-links a:hover{color:var(--ink)}
@@ -647,8 +646,7 @@ footer{border-top:1px solid var(--border);background:var(--bg-2)}
 @media (max-width:760px){
   .nav{gap:12px;height:60px}
   .logo{font-size:15px;gap:8px}
-  .logo-mark{width:26px;height:26px;flex:0 0 26px;border-radius:8px}
-  .logo-mark svg{width:15px;height:15px}
+  .logo-mark{width:28px;height:28px;flex:0 0 28px}
   .nav-right{gap:7px}
   .btn-sm{padding:8px 13px;font-size:13px}
   .nav .btn-sm .circ{display:none}

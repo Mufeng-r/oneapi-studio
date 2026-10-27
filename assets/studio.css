@@ -56,9 +56,8 @@ body.studio-lock{overflow:hidden}
 }
 .st-logo{display:flex;align-items:center;gap:9px;padding:4px 8px 22px;
   font-size:17px;font-weight:800;letter-spacing:-.03em;text-align:left}
-.st-logo:hover{opacity:.8}
-.st-logo i{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
-  background:var(--st-acc);color:var(--st-acc-ink);font-style:normal;font-size:13px;font-weight:900}
+.st-logo img{width:28px;height:28px;flex-shrink:0;display:block;transition:transform .45s var(--ease)}
+.st-logo:hover img{transform:perspective(120px) rotateY(-28deg)}
 .st-new{
   display:flex;align-items:center;gap:10px;padding:11px 14px;margin-bottom:8px;
   border:1px solid var(--st-line-2);border-radius:12px;font-size:14px;font-weight:600;

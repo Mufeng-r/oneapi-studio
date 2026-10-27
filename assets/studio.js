@@ -165,7 +165,7 @@
     root.setAttribute('aria-label', '创作工作台');
     root.innerHTML =
       '<aside class="st-side">' +
-        '<button class="st-logo" data-act="close" title="返回首页"><i>O</i><span>OneAPI Studio</span></button>' +
+        '<button class="st-logo" data-act="close" title="返回首页"><img src="assets/logo.svg" alt="" /><span>OneAPI Studio</span></button>' +
         '<button class="st-new" data-act="new">' + ICON.plus + '<span>新建项目</span></button>' +
         '<button class="st-nav on">' + ICON.home + '<span>工作室</span></button>' +
         '<button class="st-nav" data-act="soon">' + ICON.grid + '<span>作品广场</span></button>' +
