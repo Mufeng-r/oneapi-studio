@@ -40,7 +40,6 @@
     repo: svg('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>'),
     check: svg('<path d="M5 12l5 5 9-10"/>', ' class="st-check" stroke-width="2.4"'),
     play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
-    flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s5 4.6 5 10a5 5 0 0 1-10 0c0-2.4 1.3-4 1.3-4s.3 2.4 2.2 2.4C12.4 10.4 10 6.5 12 2z"/></svg>',
     heart: svg('<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>'),
     page: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5"/>'),
     game: svg('<rect x="2" y="7" width="20" height="11" rx="4"/><path d="M7 11v3M5.5 12.5h3M15.5 12h.01M18 13.5h.01"/>'),
@@ -51,21 +50,38 @@
   };
 
   // ===== 每个类型的工具区与素材配置 =====
-  const IMAGE_TITLES = ['呱呱与辣条的奇妙冒险', '听见你的心声', '宠物重生计', '上岸', '裤头与二胆：进城篇',
-    '别闹了法姥', '广阔的土地生不出狭隘的心', '校霸竟是我自己', '中秋在哪都要好好过', '口袋与金扣',
-    '山门外', '同锅', '我的前半生之默片版', '打工人公司逃亡', '龟仙', '1994 圣诞节'];
-  const VIDEO_TITLES = ['咕咕嘎嘎吃火锅', '阿拉丁', '归墟行动：巨鳌负山', '普度众生', '流水线如何颠覆世界',
-    '崂山道士', '木木的小事', '荷间入梦｜江南夏日', '拜月', '晚开的花', '甄海传', '霸王', '丑妻',
-    '灰小子', '妙脆角猫的生存日记', '预言中的恋人'];
-  const CODE_TITLES = ['SaaS 产品落地页', '运营数据看板', '贪吃蛇小游戏', '看板式任务管理', '天气预报卡片',
-    'AI 聊天界面', '音乐播放器', '三档定价页', '今日待办清单', '计算器', '设计师作品集', '路线导航'];
+  // 瀑布流素材：[标题, 分类, 展示比例]。分类按图片实际内容逐张标注；
+  // 原图都是 16:9，图片类按内容裁成不同比例，形成高低错落
+  const IMAGE_ITEMS = [
+    ['呱呱与辣条的奇妙冒险', '动漫', '4/5'], ['听见你的心声', '动漫', '3/4'], ['宠物重生计', '萌宠', '1/1'],
+    ['上岸', '人像', '4/5'], ['裤头与二胆：进城篇', '人像', '4/3'], ['别闹了法姥', '人像', '1/1'],
+    ['广阔的土地生不出狭隘的心', '人像', '16/10'], ['校霸竟是我自己', '人像', '4/5'], ['中秋在哪都要好好过', '人像', '3/4'],
+    ['口袋与金扣', '萌宠', '4/3'], ['山门外', '人像', '4/5'], ['同锅', '场景', '16/10'],
+    ['我的前半生之默片版', '人像', '1/1'], ['打工人公司逃亡', '场景', '4/3'], ['龟仙', '萌宠', '4/5'],
+    ['1994 圣诞节', '场景', '3/4'],
+  ];
+  // 视频封面标题多贴在画面两侧，只对标题居中的几张用 4:3，避免裁掉字
+  const VIDEO_ITEMS = [
+    ['咕咕嘎嘎吃火锅', '动画', '16/9'], ['阿拉丁', '动画', '16/9'], ['归墟行动：巨鳌负山', '奇幻', '16/9'],
+    ['普度众生', '奇幻', '4/3'], ['流水线如何颠覆世界', '纪实', '16/9'], ['崂山道士', '国风', '16/9'],
+    ['木木的小事', '动画', '4/3'], ['荷间入梦｜江南夏日', '国风', '16/9'], ['拜月', '剧情', '16/9'],
+    ['晚开的花', '剧情', '16/9'], ['甄海传', '国风', '16/9'], ['霸王', '国风', '4/3'],
+    ['丑妻', '国风', '16/9'], ['灰小子', '剧情', '16/9'], ['妙脆角猫的生存日记', '动画', '16/9'],
+    ['预言中的恋人', '剧情', '4/3'],
+  ];
+  // Coding 截图按 SVG 原始尺寸（宽 480）给比例，保证图片加载前就占好位置
+  const CODE_ITEMS = [
+    ['SaaS 产品落地页', '网页', '480/340'], ['运营数据看板', '工具', '480/360'], ['贪吃蛇小游戏', '游戏', '480/400'],
+    ['看板式任务管理', '工具', '480/320'], ['天气预报卡片', '应用', '480/420'], ['AI 聊天界面', '应用', '480/380'],
+    ['音乐播放器', '应用', '480/300'], ['三档定价页', '网页', '480/340'], ['今日待办清单', '工具', '480/330'],
+    ['计算器', '工具', '480/420'], ['设计师作品集', '网页', '480/380'], ['路线导航', '应用', '480/340'],
+  ];
 
   const pad = function (n) { return (n < 10 ? '0' : '') + n; };
 
   const TYPES = {
     image: {
       label: '图片', title: 'OneAPI 图片工作台', icon: 'image',
-      hint: '<b>描述画面</b>，或上传参考图做图生图、重绘与放大',
       placeholder: '描述你想要的画面，例如：赛博朋克风格的猫咪侦探，霓虹雨夜，电影感光影…',
       options: [
         { key: 'ratio', icon: 'ratio', values: ['1:1', '3:4', '16:9', '9:16'] },
@@ -80,14 +96,14 @@
         { name: '头像写真', thumb: 'image-13', prompt: '把上传的照片转成复古黑白默片风格头像，保留人物五官特征' },
         { name: '局部重绘', icon: 'palette', prompt: '把图中人物的衣服换成红色汉服，其余保持不变' },
       ],
-      feed: IMAGE_TITLES.map(function (t, i) {
-        return { title: t, src: SHOW + 'image-' + pad(i + 1) + '.webp',
-          ratio: ['3/4', '1/1', '4/5', '16/10', '3/4', '4/3'][i % 6] };
+      cats: ['人像', '萌宠', '动漫', '场景'],
+      thumb: SHOW + 'image-02.webp',
+      feed: IMAGE_ITEMS.map(function (x, i) {
+        return { title: x[0], tag: x[1], ratio: x[2], src: SHOW + 'image-' + pad(i + 1) + '.webp' };
       }),
     },
     video: {
       label: '视频', title: 'OneAPI 视频工作台', icon: 'video',
-      hint: '<b>文生视频、图生视频</b>，支持首尾帧控制与异步回调',
       placeholder: '描述镜头和动作，例如：一只柴犬在樱花雨中奔跑，慢镜头，镜头缓慢推近…',
       options: [
         { key: 'dur', icon: 'clock', values: ['5 秒', '8 秒', '10 秒'] },
@@ -102,14 +118,15 @@
         { name: '运镜模板', thumb: 'video-10', prompt: '希区柯克变焦运镜：人物不动，背景快速拉远' },
         { name: '口型同步', thumb: 'video-13', prompt: '让人物按上传的音频说话，口型自然同步，表情生动' },
       ],
-      feed: VIDEO_TITLES.map(function (t, i) {
-        return { title: t, src: SHOW + 'video-' + pad(i + 1) + '.webp',
-          ratio: i % 5 === 2 ? '4/3' : '16/9', dur: '0:' + pad(8 + (i * 7) % 50) };
+      cats: ['剧情', '国风', '动画', '奇幻'],
+      thumb: SHOW + 'video-08.webp',
+      feed: VIDEO_ITEMS.map(function (x, i) {
+        return { title: x[0], tag: x[1], ratio: x[2], src: SHOW + 'video-' + pad(i + 1) + '.webp',
+          dur: '0:' + pad(8 + (i * 7) % 50) };
       }),
     },
     code: {
       label: 'Coding', title: 'OneAPI Coding 工作台', icon: 'code',
-      hint: '<b>一句话生成</b>网页、小游戏和数据看板，也能读代码、修 Bug',
       placeholder: '描述你想做的东西，例如：做一个带登录和图表的 SaaS 运营后台，深色主题…',
       options: [
         { key: 'lang', icon: 'code', values: ['HTML', 'React', 'Vue', 'Python'] },
@@ -124,8 +141,10 @@
         { name: '修 Bug', icon: 'bug', prompt: '帮我排查这段代码为什么在 Safari 下报错，并给出修复方案：' },
         { name: '写单测', icon: 'test', prompt: '为下面这个函数补齐单元测试，覆盖边界情况：' },
       ],
-      feed: CODE_TITLES.map(function (t, i) {
-        return { title: t, src: SHOW + 'code-' + pad(i + 1) + '.svg' };
+      cats: ['网页', '应用', '工具', '游戏'],
+      thumb: SHOW + 'code-02.svg',
+      feed: CODE_ITEMS.map(function (x, i) {
+        return { title: x[0], tag: x[1], ratio: x[2], src: SHOW + 'code-' + pad(i + 1) + '.svg' };
       }),
     },
   };
@@ -145,7 +164,7 @@
   function likes(i) { return (((i + 3) * 7919) % 900 + 60) / 10 + 'k'; }
 
   // ===== 状态 =====
-  const state = { type: 'image', model: {}, opt: {}, sort: 'hot', busy: false };
+  const state = { type: 'image', model: {}, opt: {}, cat: {}, sort: 'hot', cols: 0, busy: false };
   let root = null;
   let openedFrom = null;
   let lastFocus = null;
@@ -174,7 +193,7 @@
         '<div class="st-sep"></div>' +
         '<button class="st-nav" data-act="soon">' + ICON.folder + '<span>我的项目</span><i class="st-more">' + ICON.chevR + '</i></button>' +
         '<div class="st-side-foot">' +
-          '<div class="st-credit">演示额度<b>$5.00</b>新用户注册即送，<em>最低 1.5 折</em>调用全部模型</div>' +
+          '<div class="st-credit">演示额度<b>$5.00</b></div>' +
         '</div>' +
       '</aside>' +
       '<main class="st-main" tabindex="-1">' +
@@ -182,7 +201,8 @@
           '<button class="st-back" data-act="close" aria-label="返回首页">' + ICON.back + '<span>返回首页</span></button>' +
           '<nav class="st-tabs" role="tablist" aria-label="能力类型">' +
             ['image', 'video', 'code'].map(function (t) {
-              return '<button class="st-tab" role="tab" data-tab="' + t + '">' + ICON[t] + TYPES[t].label + '</button>';
+              return '<button class="st-tab" role="tab" data-tab="' + t + '">' +
+                '<img class="st-tab-thumb" src="' + TYPES[t].thumb + '" alt="" />' + ICON[t] + TYPES[t].label + '</button>';
             }).join('') +
           '</nav>' +
           '<div class="st-top-right">' +
@@ -193,7 +213,6 @@
         '</header>' +
         '<section class="st-hero">' +
           '<h2 class="st-title"><i data-ref="titleIcon"></i><span data-ref="title"></span></h2>' +
-          '<p class="st-hint" data-ref="hint"></p>' +
           '<div class="st-composer" data-ref="composer">' +
             '<button class="st-upload" data-act="soon" aria-label="上传参考素材">' + ICON.upload + '</button>' +
             '<textarea class="st-prompt" data-ref="prompt" rows="3" aria-label="创作需求"></textarea>' +
@@ -203,18 +222,18 @@
           '<div class="st-skills" data-ref="skills"></div>' +
         '</section>' +
         '<section class="st-results" data-ref="results" hidden>' +
-          '<div class="st-sec-head"><h3>本次生成</h3><span>演示结果，未调用真实 API</span></div>' +
+          '<div class="st-sec-head"><h3>本次生成</h3><span>演示，未调用真实 API</span></div>' +
           '<div class="st-result-row" data-ref="resultRow"></div>' +
         '</section>' +
         '<section class="st-feed">' +
-          '<div class="st-sec-head"><h3 data-ref="feedTitle"></h3>' +
+          '<div class="st-feed-head">' +
+            '<div class="st-cats" data-ref="cats" role="tablist" aria-label="作品分类"></div>' +
             '<div class="st-filters">' +
               '<button class="st-filter on" data-sort="hot">热门</button>' +
               '<button class="st-filter" data-sort="new">最新</button>' +
             '</div>' +
           '</div>' +
           '<div class="st-masonry" data-ref="feed"></div>' +
-          '<p class="st-feed-note">示例素材仅用于演示，正式上线前需替换为自有作品</p>' +
         '</section>' +
       '</main>' +
       '<div class="st-toast" data-ref="toast" role="status"></div>';
@@ -237,9 +256,7 @@
     });
     ref('titleIcon').innerHTML = ICON[cfg.icon];
     ref('title').textContent = cfg.title;
-    ref('hint').innerHTML = cfg.hint;
     ref('prompt').placeholder = cfg.placeholder;
-    ref('feedTitle').textContent = cfg.label + (/[A-Za-z]$/.test(cfg.label) ? ' ' : '') + '精选';
 
     if (!state.model[state.type]) state.model[state.type] = modelsOf(state.type)[0];
     if (!state.opt[state.type]) state.opt[state.type] = cfg.options.map(function () { return 0; });
@@ -247,6 +264,7 @@
     renderToolbar();
     renderMenu();
     renderSkills();
+    renderCats();
     renderFeed();
     closeMenu();
   }
@@ -300,28 +318,77 @@
     }).join('');
   }
 
+  function renderCats() {
+    const cfg = TYPES[state.type];
+    const cur = state.cat[state.type] || 'all';
+    const count = function (c) {
+      return c === 'all' ? cfg.feed.length : cfg.feed.filter(function (it) { return it.tag === c; }).length;
+    };
+    ref('cats').innerHTML = ['all'].concat(cfg.cats).map(function (c) {
+      return '<button class="st-cat' + (c === cur ? ' on' : '') + '" role="tab" aria-selected="' + (c === cur) + '" data-cat="' + c + '">' +
+        (c === 'all' ? '全部' : c) + '<span>' + count(c) + '</span></button>';
+    }).join('');
+  }
+
+  // 列数按窗口宽度算（工作台隐藏时容器宽度为 0，不能用容器量）
+  function columnCount() {
+    const w = window.innerWidth;
+    const side = w > 1100 ? 232 : w > 720 ? 76 : 0;
+    const avail = Math.min(1480, w - side) - (w > 720 ? 56 : 32);
+    return Math.max(2, Math.min(5, Math.floor((avail + 8) / (236 + 8))));
+  }
+
+  // 高宽比，用于估算每列高度
+  function heightOf(it) {
+    const r = it.ratio.split('/');
+    return +r[1] / +r[0];
+  }
+
+  // 瀑布流：每张卡放进当前最矮的一列（同高取最左），视觉上从左到右按排名排列。
+  // 用 CSS Grid 显式定位：行单位 = 列宽的 1%（见 studio.css 的 grid-auto-rows），
+  // 卡片占的行数 = 高宽比 × 100，所以高度严格等于原始比例；DOM 保持排名顺序，键盘和读屏也按这个顺序走
+  const ROW_GAP = 3;   // 同列卡片之间留 3 个行单位（约 8px）
   function renderFeed() {
     const type = state.type;
     const models = modelsOf(type);
-    const items = TYPES[type].feed.map(function (it, i) { return { it: it, i: i }; });
-    if (state.sort === 'new') items.reverse();
+    const cat = state.cat[type] || 'all';
+    let items = TYPES[type].feed.map(function (it, i) { return { it: it, i: i }; })
+      .filter(function (x) { return cat === 'all' || x.it.tag === cat; });
+    if (state.sort === 'new') items = items.reverse();
 
-    ref('feed').innerHTML = items.map(function (x, n) {
+    state.cols = columnCount();
+    const ends = [];
+    for (let c = 0; c < state.cols; c++) ends.push(0);
+
+    const html = items.map(function (x, n) {
       const it = x.it;
       const m = models[x.i % models.length];
-      const media =
-        '<div class="st-item-media"' + (it.ratio ? ' style="aspect-ratio:' + it.ratio + '"' : '') + '>' +
-          '<img src="' + it.src + '" alt="' + it.title + '" loading="lazy" />' +
-          (x.i < 3 ? '<span class="st-badge">' + ICON.flame + '热门</span>' : '') +
-          (it.dur ? '<span class="st-play">' + ICON.play + '</span><span class="st-dur">' + it.dur + '</span>' : '') +
-          '<button class="st-remix" data-remix="' + x.i + '">做同款</button>' +
-        '</div>';
-      return '<article class="st-item" style="animation-delay:' + Math.min(n * 30, 360) + 'ms">' + media +
-        '<div class="st-item-body"><div class="st-item-title">' + it.title + '</div>' +
-          '<div class="st-item-meta"><img src="' + logoSrc(m) + '" alt="" /><span class="st-item-model">' + m.name + '</span>' +
-            '<span class="st-like">' + ICON.heart + likes(x.i) + '</span></div>' +
-        '</div></article>';
-    }).join('');
+      let c = 0;
+      for (let k = 1; k < ends.length; k++) if (ends[k] < ends[c]) c = k;
+      const span = Math.round(heightOf(it) * 100);
+      const start = ends[c] + 1;
+      ends[c] += span + ROW_GAP;
+      return (
+        '<article class="st-item" data-remix="' + x.i + '" tabindex="0" role="button" aria-label="' + it.title + '，做同款"' +
+          ' style="grid-column:' + (c + 1) + ';grid-row:' + start + ' / span ' + span +
+          ';animation-delay:' + Math.min(n * 40, 480) + 'ms">' +
+          '<img src="' + it.src + '" alt="" loading="lazy" decoding="async" />' +
+          (it.dur ? '<span class="st-vid" aria-hidden="true">' + ICON.play + '</span><span class="st-dur">' + it.dur + '</span>' : '') +
+          '<div class="st-hover">' +
+            '<div class="st-hover-title">' + it.title + '</div>' +
+            '<div class="st-hover-meta"><img src="' + logoSrc(m) + '" alt="" /><span class="st-item-model">' + m.name + '</span>' +
+              '<span class="st-like">' + ICON.heart + likes(x.i) + '</span></div>' +
+            '<span class="st-remix">做同款</span>' +
+          '</div>' +
+        '</article>');
+    });
+
+    ref('feed').style.setProperty('--cols', state.cols);
+    ref('feed').innerHTML = html.join('');
+    // 已在缓存里的图片不会再触发 load，直接标记为已加载
+    ref('feed').querySelectorAll('img').forEach(function (img) {
+      if (img.complete && img.naturalWidth) img.closest('.st-item').classList.add('is-loaded');
+    });
   }
 
   // ===== 交互 =====
@@ -461,6 +528,14 @@
         return;
       }
 
+      const cat = t.closest('[data-cat]');
+      if (cat) {
+        state.cat[state.type] = cat.dataset.cat;
+        renderCats();
+        renderFeed();
+        return;
+      }
+
       const sort = t.closest('[data-sort]');
       if (sort) {
         state.sort = sort.dataset.sort;
@@ -489,6 +564,29 @@
       }
 
       if (!t.closest('.st-menu')) closeMenu();
+    });
+
+    // 卡片是整块可点的按钮：键盘 Enter / 空格同样触发「做同款」
+    ref('feed').addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('st-item')) {
+        e.preventDefault();
+        e.target.click();
+      }
+    });
+
+    // 图片加载完再淡入，加载前显示占位底色（高度已由 aspect-ratio 撑好，不会跳动）
+    ref('feed').addEventListener('load', function (e) {
+      if (e.target.tagName === 'IMG' && e.target.parentElement.classList.contains('st-item')) {
+        e.target.parentElement.classList.add('is-loaded');
+      }
+    }, true);
+
+    let resizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        if (root.classList.contains('is-open') && columnCount() !== state.cols) renderFeed();
+      }, 120);
     });
 
     ref('prompt').addEventListener('keydown', function (e) {
@@ -554,6 +652,16 @@
     return Promise.race([finished, timeout]).then(function () { return el; });
   }
 
+  function syncTopHeight() {
+    const top = root.querySelector('.st-top');
+    root.style.setProperty('--st-top-h', top.offsetHeight + 'px');
+    if (!topObserver && window.ResizeObserver) {
+      topObserver = new ResizeObserver(function () { root.style.setProperty('--st-top-h', top.offsetHeight + 'px'); });
+      topObserver.observe(top);
+    }
+  }
+  let topObserver = null;
+
   // ===== 打开 / 关闭 =====
   function open(type, card) {
     if (!root) build();
@@ -571,6 +679,7 @@
       animating = false;
       root.hidden = false;
       document.body.classList.add('studio-lock');
+      syncTopHeight();   // 一显示就量顶栏高度，分类条吸顶位置不必等动画结束
       requestAnimationFrame(function () {
         root.classList.add('is-open');
         // 焦点放进工作台（键盘和读屏可用），但不自动进输入框，避免一打开就亮起聚焦边框
@@ -713,8 +822,7 @@
     apiDlg.setAttribute('aria-labelledby', 'stApiTitle');
     apiDlg.innerHTML =
       '<div class="st-api-head">' +
-        '<div><h3 id="stApiTitle">用 API 调用</h3>' +
-        '<p>按你当前选择的模型和参数生成，复制到终端即可运行。</p></div>' +
+        '<div><h3 id="stApiTitle">用 API 调用</h3></div>' +
         '<button class="st-api-x" data-api-act="close" aria-label="关闭">' + ICON.close + '</button>' +
       '</div>' +
       '<div class="st-api-meta" data-api-meta></div>' +
@@ -722,7 +830,7 @@
         '<div class="st-api-bar">' +
           '<button class="st-api-tab on" data-api-lang="curl">cURL</button>' +
           '<button class="st-api-tab" data-api-lang="py">Python</button>' +
-          '<button class="st-api-copy" data-api-act="copy">复制代码</button>' +
+          '<button class="st-api-copy copy-ico" data-api-act="copy" aria-label="复制代码">复制代码</button>' +
         '</div>' +
         '<pre data-api-code></pre>' +
       '</div>' +

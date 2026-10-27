@@ -80,14 +80,14 @@ body.studio-lock{overflow:hidden}
   font-size:12.5px;color:var(--st-sub);line-height:1.55;
 }
 .st-credit b{display:block;font-size:20px;color:var(--st-text);font-weight:750;letter-spacing:-.03em}
-.st-credit em{font-style:normal;color:var(--st-acc);font-weight:650}
 
 /* ---------- 主区域 ---------- */
 .st-main{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:smooth}
 .st-top{
   position:sticky;top:0;z-index:5;
   display:flex;align-items:center;gap:12px;padding:18px 28px;
-  background:linear-gradient(var(--st-bg) 70%,transparent);
+  /* 实色：下方吸顶的分类条紧贴着它，渐变透明会让滚动的图片从两条之间漏出来 */
+  background:var(--st-bg);
   /* 抵消落地页全局 header{} 的边框和毛玻璃 */
   border-bottom:0;backdrop-filter:none;-webkit-backdrop-filter:none;
 }
@@ -109,6 +109,10 @@ body.studio-lock{overflow:hidden}
 .st-tab:hover{color:var(--st-text)}
 .st-tab.on{background:var(--st-text);color:#0d0d10}
 .st-tab svg{width:15px;height:15px}
+.st-tab-thumb{display:none;width:22px;height:22px;margin:-3px 0 -3px -8px;border-radius:50%;object-fit:cover;
+  background:#fff;box-shadow:0 0 0 2px rgba(13,13,16,.12)}
+.st-tab.on .st-tab-thumb{display:block}
+.st-tab.on svg{display:none}
 .st-top-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .st-pill{
   display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;
@@ -127,15 +131,13 @@ body.studio-lock{overflow:hidden}
 .st-hero{max-width:1080px;margin:0 auto;padding:22px 28px 8px;text-align:center}
 .st-title{
   display:inline-flex;align-items:center;gap:12px;
-  font-size:clamp(24px,2.6vw,32px);font-weight:760;letter-spacing:-.035em;margin-bottom:10px;
+  font-size:clamp(24px,2.6vw,32px);font-weight:760;letter-spacing:-.035em;margin-bottom:24px;
 }
 .st-title i{
   width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-style:normal;
   background:color-mix(in srgb,var(--st-acc) 18%,transparent);color:var(--st-acc);
 }
 .st-title i svg{width:20px;height:20px}
-.st-hint{font-size:13.5px;color:var(--st-sub);margin-bottom:24px}
-.st-hint b{color:var(--st-acc);font-weight:600}
 
 .st-composer{
   position:relative;text-align:left;
@@ -234,7 +236,6 @@ body.studio-lock{overflow:hidden}
 .st-api[open]{animation:st-fade .28s}
 .st-api-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
 .st-api-head h3{font-size:19px;font-weight:700;letter-spacing:-.03em}
-.st-api-head p{font-size:13px;color:var(--st-sub);margin-top:5px}
 .st-api-x{margin-left:auto;width:34px;height:34px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;
   color:var(--st-sub);border:1px solid var(--st-line) !important}
 .st-api-x:hover{color:var(--st-text)}
@@ -255,6 +256,7 @@ body.studio-lock{overflow:hidden}
 .st-api-copy{margin-left:auto}
 .st-api-copy:hover,.st-api-key:hover{opacity:.88}
 .st-api-copy.is-done{background:#34d399 !important}
+.st-api-copy.copy-ico{width:30px;height:30px;padding:0;font-size:0}
 .st-api-code pre{margin:0;padding:14px 16px;max-height:340px;overflow:auto;
   font-family:var(--mono);font-size:11.5px;line-height:1.8;color:#c8c8d0;white-space:pre}
 .st-api-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-size:12.5px;color:var(--st-sub)}
@@ -312,57 +314,112 @@ body.studio-lock{overflow:hidden}
 .st-progress b{display:block;font-size:22px;color:var(--st-text);font-weight:700;
   font-variant-numeric:tabular-nums;margin-bottom:2px}
 
-/* ---------- 素材瀑布流 ---------- */
-.st-feed{max-width:1480px;margin:0 auto;padding:12px 28px 56px}
-.st-filters{display:flex;gap:6px}
-.st-filter{padding:6px 13px;border-radius:999px;font-size:13px;font-weight:550;color:var(--st-sub);
-  border:1px solid var(--st-line) !important;transition:all .16s}
-.st-filter:hover{color:var(--st-text)}
-.st-filter.on{background:var(--st-text);color:#0d0d10;border-color:var(--st-text) !important}
-.st-masonry{columns:4 260px;column-gap:14px}
+/* ---------- 素材瀑布流 ----------
+   参考 RunningHub「灵感」与即梦「探索」：静止时只有画面，悬停才出标题、模型、点赞和「做同款」；
+   卡片间距收紧成作品墙；分类条吸顶。列由 JS 按「放进最矮一列」分配，阅读顺序从左到右。 */
+.st-feed{max-width:1480px;margin:0 auto;padding:4px 28px 56px;container-type:inline-size;--gap:8px}
+.st-feed-head{
+  /* 往上多盖 1px，避免顶栏高度是小数时两条之间出现发丝缝 */
+  position:sticky;top:calc(var(--st-top-h,76px) - 1px);z-index:4;
+  display:flex;align-items:center;gap:16px;margin:0 -28px 12px;padding:10px 28px;
+  background:var(--st-bg);
+}
+/* 分类条下沿的短渐隐：图片滚进去时逐渐变暗，而不是被一刀切断 */
+.st-feed-head::after{
+  content:'';position:absolute;left:0;right:0;top:100%;height:16px;pointer-events:none;
+  background:linear-gradient(var(--st-bg),transparent);
+}
+.st-cats{display:flex;gap:6px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.st-cats::-webkit-scrollbar{display:none}
+.st-cat{
+  display:inline-flex;align-items:baseline;gap:5px;flex-shrink:0;padding:7px 14px;border-radius:999px;
+  font-size:13.5px;font-weight:600;color:var(--st-sub);transition:background .16s,color .16s;
+}
+.st-cat span{font-size:11px;font-weight:500;color:var(--st-dim);font-variant-numeric:tabular-nums}
+.st-cat:hover{color:var(--st-text);background:var(--st-panel)}
+.st-cat.on{background:var(--st-text);color:#0d0d10}
+.st-cat.on span{color:#6b6b78}
+.st-filters{display:flex;gap:2px;margin-left:auto;flex-shrink:0}
+.st-filter{padding:6px 11px;border-radius:8px;font-size:13px;font-weight:550;color:var(--st-dim);transition:color .16s}
+.st-filter:hover{color:var(--st-sub)}
+.st-filter.on{color:var(--st-text)}
+
+/* 行单位 = 列宽的 1%（cqw 取自 .st-feed 的内容宽度），卡片按 JS 算好的行号精确落位 */
+.st-masonry{
+  display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));column-gap:var(--gap);row-gap:0;
+  grid-auto-rows:calc((100cqw - (var(--cols,4) - 1) * var(--gap)) / var(--cols,4) / 100);
+}
 .st-item{
-  position:relative;break-inside:avoid;margin-bottom:14px;border-radius:16px;overflow:hidden;
-  background:var(--st-panel);border:1px solid var(--st-line);cursor:pointer;
-  animation:st-fade .45s both;
+  position:relative;overflow:hidden;border-radius:10px;cursor:pointer;
+  background:var(--st-panel);animation:st-fade .45s both;
 }
-.st-item-media{position:relative;overflow:hidden}
-.st-item-media img{width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .5s var(--ease)}
-.st-item:hover .st-item-media img{transform:scale(1.045)}
-.st-badge{
-  position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:5px;
-  padding:4px 9px;border-radius:999px;font-size:11.5px;font-weight:600;
-  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;
+/* 加载占位的流光放在伪元素上：图片加载完只隐藏它，不改卡片自身动画，避免淡入重播 */
+.st-item::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,var(--st-panel) 30%,var(--st-panel-2) 50%,var(--st-panel) 70%);
+  background-size:220% 100%;animation:st-sheen 1.4s linear infinite;
 }
-.st-badge svg{width:11px;height:11px;color:#ff6b4a}
+.st-item.is-loaded::before{display:none}
+.st-item > img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0;transition:opacity .5s var(--ease),transform .7s var(--ease);
+}
+.st-item.is-loaded > img{opacity:1}
+.st-item:hover > img,.st-item:focus-visible > img{transform:scale(1.05)}
+/* 视频封面：没有视频文件，用缓慢推近模拟「动起来」 */
+.studio[data-type="video"] .st-item:hover > img{transform:scale(1.12);transition:opacity .5s,transform 4s linear}
+.st-item:focus-visible{outline:2px solid var(--st-acc);outline-offset:2px}
+
+.st-vid{
+  position:absolute;left:8px;top:8px;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;
+}
+.st-vid svg{width:10px;height:10px;margin-left:1px}
 .st-dur{
-  position:absolute;right:10px;bottom:10px;padding:3px 8px;border-radius:7px;
-  font-size:11.5px;font-family:var(--mono);background:rgba(0,0,0,.6);color:#fff;
+  position:absolute;right:8px;bottom:8px;padding:2px 6px;border-radius:6px;
+  font-size:11px;font-family:var(--mono);background:rgba(0,0,0,.55);color:#fff;transition:opacity .2s;
 }
+
+/* 悬停层：从底部渐暗，信息依次上浮 */
+.st-hover{
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:12px;
+  background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.82));
+  opacity:0;transition:opacity .25s var(--ease);
+}
+.st-hover > *{transform:translateY(6px);transition:transform .3s var(--ease)}
+.st-item:hover .st-hover,.st-item:focus-visible .st-hover{opacity:1}
+.st-item:hover .st-hover > *,.st-item:focus-visible .st-hover > *{transform:none}
+.st-item:hover .st-dur{opacity:0}
+.st-hover-title{font-size:14px;font-weight:650;color:#fff;line-height:1.35;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-hover-meta{display:flex;align-items:center;gap:6px;font-size:11.5px;color:rgba(255,255,255,.72)}
+.st-hover-meta img{width:14px;height:14px;border-radius:4px;background:#fff;padding:1px;flex-shrink:0}
+.st-item-model{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-like{margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:4px}
+.st-like svg{width:12px;height:12px}
+.st-remix{
+  display:block;margin-top:4px;padding:8px 0;border-radius:8px;text-align:center;
+  font-size:13px;font-weight:700;color:var(--st-acc);
+  border:1px solid color-mix(in srgb,var(--st-acc) 70%,transparent);
+  background:color-mix(in srgb,var(--st-acc) 12%,rgba(0,0,0,.3));
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .16s,color .16s;
+}
+.st-item:hover .st-remix:hover{background:var(--st-acc);color:var(--st-acc-ink)}
+/* 视频结果卡里的播放键（生成结果区在用） */
 .st-play{
   position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;
   display:grid;place-items:center;background:rgba(255,255,255,.18);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s var(--ease);
 }
 .st-play svg{width:18px;height:18px;color:#fff;margin-left:3px}
-.st-item:hover .st-play{opacity:1;transform:none}
-.st-remix{
-  position:absolute;top:10px;right:10px;padding:6px 12px;border-radius:999px;
-  font-size:12px;font-weight:700;background:var(--st-acc) !important;color:var(--st-acc-ink) !important;
-  opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s var(--ease);
+
+/* 触屏没有悬停：常驻一条精简的标题渐变，点卡片即「做同款」 */
+@media (hover:none){
+  .st-hover{opacity:1;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.7));padding:8px 10px}
+  .st-hover > *{transform:none}
+  .st-hover-meta,.st-remix{display:none}
+  .st-hover-title{font-size:12.5px}
 }
-.st-item:hover .st-remix,.st-item:focus-within .st-remix{opacity:1;transform:none}
-.st-item-body{padding:11px 13px 12px}
-.st-item-title{font-size:13.5px;font-weight:600;line-height:1.45;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.st-item-meta{display:flex;align-items:center;gap:6px;margin-top:7px;font-size:11.5px;color:var(--st-dim)}
-.st-item-model{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.st-item-meta .st-like{flex-shrink:0}
-.st-item-meta img{width:14px;height:14px;border-radius:4px;background:#fff;padding:1px}
-.st-item-meta .st-like{margin-left:auto;display:inline-flex;align-items:center;gap:4px}
-.st-item-meta .st-like svg{width:12px;height:12px}
-.st-feed-note{margin-top:8px;text-align:center;font-size:12px;color:var(--st-dim)}
 
 /* 演示提示条 */
 .st-toast{
@@ -392,15 +449,17 @@ body.studio-lock{overflow:hidden}
   .st-tab{flex:1;justify-content:center;padding:9px 8px;font-size:13.5px}
   .st-top-right .st-pill:not(.st-pill-acc){display:none}
   .st-hero{padding:8px 16px 4px}
-  .st-hint{margin-bottom:16px}
+  .st-title{margin-bottom:16px}
   .st-skills{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .st-skill{font-size:13px}
   .st-skill-thumb,.st-skill-ico{width:40px;height:30px}
   .st-results{padding:4px 16px 0}
-  .st-feed{padding:8px 16px 40px}
-  .st-masonry{columns:2;column-gap:10px}
-  .st-item{margin-bottom:10px;border-radius:12px}
-  .st-filters{display:none}
+  .st-feed{padding:0 16px 40px}
+  .st-feed-head{margin:0 -16px 8px;padding:8px 16px;gap:8px}
+  .st-cat{padding:6px 11px;font-size:13px}
+  .st-filter{padding:6px 8px}
+  .st-feed{--gap:6px}
+  .st-item{border-radius:8px}
   .st-menu{left:0}
 }
 @media (prefers-reduced-motion:reduce){
